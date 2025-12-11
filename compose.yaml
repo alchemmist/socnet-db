@@ -8,6 +8,9 @@ services:
       POSTGRES_PASSWORD: qwerty
       LOAD_SAMPLE_DATA: "true"
       REGENERATE_SAMPLE_DATA: "true"
+      USE_SCD2_VERSIONING: "true"
+      TEST_UPDATES_FOR_SCD: "true"
+      EMAIL_VALIDATE_TRIGGER: "true"
       NUM_USERS: 200
       NUM_POSTS: 1000
       NUM_COMMENTS: 500

@@ -4,6 +4,8 @@ set -euo pipefail
 SEED_FILE="/docker-entrypoint-initdb.d/seed.sql"
 REQ_FILE="scripts/requirements.txt"
 GEN_SCRIPT="scripts/gen-seed.py"
+SCD_LOADER_FILE="/docker-entrypoint-initdb.d/scd2_loader.sql"
+SCD_TEST_FILE="/docker-entrypoint-initdb.d/scd2_test_update.sql"
 
 if [ "${REGENERATE_SAMPLE_DATA}" = "true" ]; then
     uv run --with-requirements="${REQ_FILE}" \
@@ -25,6 +27,14 @@ sleep 1
 
 if [ "${LOAD_SAMPLE_DATA}" = "true" ]; then
     psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f "${SEED_FILE}"
+fi
+
+if [ "${USE_SCD2_VERSIONING}" = "true" ]; then
+    psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f "${SCD_LOADER_FILE}"
+fi
+
+if [ "${USE_SCD2_VERSIONING}" = "true" ] && [ "${LOAD_SAMPLE_DATA}" = "true" ] && [ "${TEST_UPDATES_FOR_SCD}" = "true" ]; then
+    psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f "${SCD_TEST_FILE}"
 fi
 
 wait

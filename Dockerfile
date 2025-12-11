@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     git \
  && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --break-system-packages uv psycopg2-binary
+RUN pip3 install --break-system-packages uv psycopg2-binary faker
 
 COPY src/ /docker-entrypoint-initdb.d/
 COPY scripts/ /scripts/
@@ -20,11 +20,14 @@ ENV POSTGRES_DB=socnet
 ENV POSTGRES_USER=admin
 ENV LOAD_SAMPLE_DATA=false
 ENV REGENERATE_SAMPLE_DATA=false
+ENV TEST_UPDATES_FOR_SCD=false
+ENV EMAIL_VALIDATE_TRIGGER=true
 
 ENV NUM_USERS=10
 ENV NUM_POSTS=50
 ENV NUM_COMMENTS=50
 ENV NUM_LIKES=100
 ENV NUM_FRIENDSHIPS=5
+ENV USE_SCD2_VERSIONING=false
 
 CMD ["/usr/local/bin/start.sh"]
