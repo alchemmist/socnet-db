@@ -63,3 +63,23 @@ erDiagram
     posts ||--o{ likes : "liked"
     users ||--o{ likes : "post_like_user"
 ```
+
+## How to run
+Run `socnet` database with empty tables:
+```sh
+docker run -d -p 5432:5432 \
+  -e POSTGRES_PASSWORD=admin \
+  alchemmist/socnet-db:latest
+```
+Or run with sample data:
+```sh
+docker run -d -p 5432:5432 \
+  -e POSTGRES_PASSWORD=admin \
+  -e LOAD_SAMPLE_DATA=true \
+  alchemmist/socnet-db:latest
+```
+
+After running you can connect and working with database with:
+```sh
+psql -h localhost -p 5432 -U admin -d socnet
+```
