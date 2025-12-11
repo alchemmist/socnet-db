@@ -107,5 +107,12 @@ psql -h localhost -p 5432 -U admin -d socnet
 ```
 Also, you can see the graph of friendships:
 ```sh
-uv run --with-requirements=scripts/requirements.txt scripts/show-graph.py --host localhost --port 5432 --dbname socnet --user admin --password <your-password>
+uv run --with-requirements=scripts/requirements.txt scripts/show-graph.py \ 
+    --host localhost \
+    --port 5432 \
+    --dbname socnet \
+    --user admin \
+    --password <your-password>
 ```
+This command will open tab in your default browser with firendships graph:
+![](attachments/graph-example.png)

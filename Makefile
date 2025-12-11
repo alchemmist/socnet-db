@@ -1,7 +1,7 @@
-all: docker-hub
+all: restart
 
 restart:
-	docker compse down -v 
+	docker compose down -v 
 	docker compose pull 
 	docker compose up --build
 

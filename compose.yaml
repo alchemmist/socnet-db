@@ -7,7 +7,12 @@ services:
     environment:
       POSTGRES_PASSWORD: qwerty
       LOAD_SAMPLE_DATA: "true"
-      REGENERATE_SAMPLE_DATA: "false"
+      REGENERATE_SAMPLE_DATA: "true"
+      NUM_USERS: 200
+      NUM_POSTS: 1000
+      NUM_COMMENTS: 500
+      NUM_LIKES: 3000
+      NUM_FRIENDSHIPS: 100
     volumes:
       - socnet-data:/var/lib/postgresql/data
 
