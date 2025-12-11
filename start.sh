@@ -1,11 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 
-SEED_FILE="/docker-entrypoint-initdb.d/seed.sql"
+SEED_FILE="/docker-entrypoint-initdb.d/03_seed.sql"
 REQ_FILE="scripts/requirements.txt"
 GEN_SCRIPT="scripts/gen-seed.py"
-SCD_LOADER_FILE="/docker-entrypoint-initdb.d/scd2_loader.sql"
-SCD_TEST_FILE="/docker-entrypoint-initdb.d/scd2_test_update.sql"
+SCD_LOADER_FILE="/docker-entrypoint-initdb.d/04_scd2_loader.sql"
+SCD_TEST_FILE="/docker-entrypoint-initdb.d/tests/test_scd2_update.sql"
+EMAIL_VALIDATE_TRIGGER_FILE="/docker-entrypoint-initdb.d/02_email_validate_trigger.sql"
+
+run_psql() {
+    local sql_file="$1"
+    psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f "${sql_file}"
+}
 
 if [ "${REGENERATE_SAMPLE_DATA}" = "true" ]; then
     uv run --with-requirements="${REQ_FILE}" \
@@ -25,16 +31,14 @@ until pg_isready -h localhost -U "${POSTGRES_USER}" -d "${POSTGRES_DB}"; do
 done
 sleep 1
 
-if [ "${LOAD_SAMPLE_DATA}" = "true" ]; then
-    psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f "${SEED_FILE}"
-fi
+run_psql "/docker-entrypoint-initdb.d/01_schema.sql"
 
-if [ "${USE_SCD2_VERSIONING}" = "true" ]; then
-    psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f "${SCD_LOADER_FILE}"
-fi
+[ "${USE_SCD2_VERSIONING}" = "true" ] && run_psql "${SCD_LOADER_FILE}"
 
-if [ "${USE_SCD2_VERSIONING}" = "true" ] && [ "${LOAD_SAMPLE_DATA}" = "true" ] && [ "${TEST_UPDATES_FOR_SCD}" = "true" ]; then
-    psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f "${SCD_TEST_FILE}"
-fi
+[ "${EMAIL_VALIDATE_TRIGGER}" = "true" ] && run_psql "${EMAIL_VALIDATE_TRIGGER_FILE}"
+
+[ "${LOAD_SAMPLE_DATA}" = "true" ] && run_psql "${SEED_FILE}"
+
+[ "${USE_SCD2_VERSIONING}" = "true" ] && [ "${LOAD_SAMPLE_DATA}" = "true" ] && [ "${TEST_UPDATES_FOR_SCD}" = "true" ] && run_psql "${SCD_TEST_FILE}"
 
 wait
