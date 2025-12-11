@@ -3,6 +3,7 @@
 -- Ранжируем пользователей по индексу.
 -- Используем оконную функцию RANK
 
+EXPLAIN ANALYZE
 WITH user_posts AS (
     SELECT
         u.id AS user_id,
