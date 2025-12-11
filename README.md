@@ -64,22 +64,48 @@ erDiagram
     users ||--o{ likes : "post_like_user"
 ```
 
-## How to run
+## How run it
 Run `socnet` database with empty tables:
 ```sh
 docker run -d -p 5432:5432 \
-  -e POSTGRES_PASSWORD=admin \
+  -e POSTGRES_PASSWORD=<your-password> \
   alchemmist/socnet-db:latest
 ```
 Or run with sample data:
 ```sh
 docker run -d -p 5432:5432 \
-  -e POSTGRES_PASSWORD=admin \
+  -e POSTGRES_PASSWORD=<your-password> \
   -e LOAD_SAMPLE_DATA=true \
   alchemmist/socnet-db:latest
 ```
+And you can add `REGENERATE_SAMPLE_DATA=true` option and before starting postgres `seed.sql` will be regenerated with new data.
 
+The same options you set more useful with `compose.yaml` like this:
+```yaml
+services:
+  db:
+    image: alchemmist/socnet-db:latest
+    container_name: socnet-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: <your-password>
+      LOAD_SAMPLE_DATA: "true"
+      REGENERATE_SAMPLE_DATA: "true"
+      : "true"
+    volumes:
+      - socnet-data:/var/lib/postgresql/data
+
+volumes:
+  socnet-data:
+```
+
+## How to use it
 After running you can connect and working with database with:
 ```sh
 psql -h localhost -p 5432 -U admin -d socnet
+```
+Also, you can see the graph of friendships:
+```sh
+uv run --with-requirements=scripts/requirements.txt scripts/show-graph.py --host localhost --port 5432 --dbname socnet --user admin --password <your-password>
 ```
