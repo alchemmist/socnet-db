@@ -1,0 +1,50 @@
+Table users {
+  id uuid [primary key]
+  username varchar(255) [not null, unique]
+  name varchar(255)
+  surname varchar(255)
+  email varchar(255) [not null, unique]
+  created_at timestamp [not null, default: `now()`]
+  birth_date date
+}
+
+Table friendships {
+  id uuid [primary key]
+  user_id uuid [not null]
+  friend_id uuid [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table posts {
+  id uuid [primary key]
+  title varchar(320) [not null]
+  content text [not null]
+  author_id uuid [not null]
+  created_at timestamp [not null, default: `now()`]
+  views integer [not null, default: 0]
+}
+
+Table comments {
+  id uuid [primary key]
+  content text [not null]
+  post_id uuid [not null]
+  author_id uuid [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table likes {
+  id uuid [primary key]
+  post_id uuid [not null]
+  created_at timestamp [not null, default: `now()`]
+  user_id uuid [not null]
+}
+
+
+Ref user_posts: posts.author_id > users.id
+Ref friendships_user1: friendships.user_id > users.id
+Ref friendships_user2: friendships.friend_id > users.id
+Ref commented: comments.post_id > posts.id
+Ref commented: comments.author_id > users.id
+Ref liked: likes.post_id > posts.id
+Ref post_like_user: likes.user_id > users.id
+
